@@ -44,9 +44,10 @@ void Lexer::trim_left() {
     while (has_next() && isspace(peek())) chop();
 }
 
-inline bool Lexer::has_next() const {
+bool Lexer::has_next() const {
     return pos < fsize;
 }
+
 Loc Lexer::getloc() const {
     return Loc{file_path, row, pos-bol};
 }

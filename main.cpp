@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "lexer.h"
+#include "parser.h"
 
 template<typename T>
 void arr_push(T val, T*& arr, size_t& ct, size_t& capacity) {
@@ -22,15 +22,20 @@ int main(int argc, char* argv[]) {
     size_t ct = 0, capacity = 16;
     Token** tkns = (Token**) malloc(sizeof(Token*) * capacity);
 
+    printf("LEXING: \n");
+
     while (lexer.has_next()) {
         Token* t = lexer.next_token();
         if (t != nullptr) {
-            printf("%s:%i:%i: %s %.*s\n", 
-                t->loc.file, t->loc.row+1, t->loc.col+1, token_type_str(t->type),
-                t->srclen, t->srcptr);
+            t->print();
             arr_push(t,tkns,ct,capacity);
         }
     }
+
+    printf("\nPARSING: \n");
+    
+    Parser p((const Token**)tkns, ct, capacity);
+    p.parse();
 
     free(tkns);
     
