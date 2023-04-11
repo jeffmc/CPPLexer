@@ -131,9 +131,9 @@ Token* Lexer::next_token() {
         t->type = TokenType::Comment;
         return t;
     }
-    if (peek() == '\"') {
+    if (peek() == '\"') { // String literals
         Loc loc = getloc();
-        long start = pos, len = 1;
+        long start = pos, len = 0;
         do {
             if (peek() == '\n') return nullptr;
             chop();
@@ -162,7 +162,7 @@ Token* Lexer::next_token() {
 
     { // Literals
         char x = peek();
-        if (isalpha(x) || x == '_') { // String Literal
+        if (isalpha(x) || x == '_') { // Identifiers
             long start = pos, len = 0;
             Loc loc = getloc();
             while (has_next() && (isalnum(x) || x == '_') ) { // TODO: Escape sequences
@@ -171,10 +171,19 @@ Token* Lexer::next_token() {
                 x = peek();
             }
             Token* t = new Token();
-            t->type = TokenType::Identifier;
-            t->srcptr = fdata + start;
+            const char* const tok_src_ptr = fdata + start;
+            t->srcptr = tok_src_ptr;
             t->srclen = len;
             t->loc = loc;
+            t->type = TokenType::Identifier;
+            for (size_t i=0;i<token_keywords_ct;++i) {
+                const size_t keylen = strlen(token_keywords[i].key); // TODO: Put key string lengths in a table.
+                if (keylen + start >= fsize) break;
+                if (strncmp(token_keywords[i].key, tok_src_ptr, keylen) == 0) { 
+                    t->type = token_keywords[i].value;
+                    return t;
+                }
+            }
             return t;
         } else if (isdigit(x)) { // Integer Literal
             Loc loc = getloc();

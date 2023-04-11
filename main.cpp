@@ -14,7 +14,7 @@ void arr_push(T val, T*& arr, size_t& ct, size_t& capacity) {
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
-        printf("Must specify file! EX: \"lexer src.c\"\n");
+        printf("\x1b[31mMust specify file!\x1b[0m EX: \"lexer src.c\"\n");
         return 1;
     }
     Lexer lexer = Lexer(argv[1]);
@@ -26,11 +26,12 @@ int main(int argc, char* argv[]) {
 
     while (lexer.has_next()) {
         Token* t = lexer.next_token();
-        if (t != nullptr) {
-            t->print();
-            arr_push(t,tkns,ct,capacity);
-        }
+        assert(t != nullptr);
+        t->print();
+        arr_push<Token*>(t,tkns,ct,capacity);
     }
+
+    printf("Found %u tokens: \n");
 
     printf("\nPARSING: \n");
     
